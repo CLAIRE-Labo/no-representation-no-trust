@@ -1,0 +1,11 @@
+# @package _global_
+
+defaults:
+  - ppo
+  - _self_
+
+algo: ppo-early-stop
+
+loss:
+  policy:
+    kl_early_stop: True

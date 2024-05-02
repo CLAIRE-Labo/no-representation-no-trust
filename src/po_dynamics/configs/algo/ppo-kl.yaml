@@ -1,0 +1,14 @@
+# @package _global_
+
+# Hyperparameters from the original paper for Atari. https://arxiv.org/pdf/1707.06347.pdf
+
+defaults:
+  - ppo
+  - _self_
+
+algo: ppo-kl
+
+loss:
+  policy:
+    kwargs:
+      beta_kl: 1.

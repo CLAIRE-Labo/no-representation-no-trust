@@ -1,0 +1,43 @@
+# @package _global_
+
+algo: reinforce   # Algorithm name.
+
+collector:
+  agent_steps_per_env:
+    # The number of steps to sample per env before the update phase (the rollout size).
+    ${env.truncate_agent_steps_at}
+  is_episodic:
+    # Whether to reset the env after each batch.
+    # When true and when collector.agent_steps_per_env is equal to env.truncate_agent_steps_at,
+    # This allows collecting complete episodes and discarding the extra steps.
+    True
+
+optim:
+  # The hyperparameters relevant to the training loop.
+  # The optimizer hyperparameters (algo-independent) are defined in the main config, not here.
+  minibatch_size: ${collector.agent_steps_per_batch}
+  num_epochs: 1
+
+loss:
+  # A loss module from TorchRL
+  # Or a custom loss module from src/po_dynamics/modules/losses.
+  policy:
+    module: PPOLoss
+    advantage: value_target_actor # The estimator to multiply the grad log prob with.
+    kl_early_stop: 100000         # Early stop the minibatch/epoch optimization if KL exceeds this value.
+    kwargs:
+      use_episodic_mask: ${collector.is_episodic}
+      normalize_advantage: True   # Whether to normalize the advantage estimator.
+      entropy_coef: 0.            # Auxiliary entropy loss coefficient.
+      use_clipped_loss: False     # Whether to use the clipped loss.
+      clip_epsilon:
+        # The clipping value for the loss when use_clipped_loss is True.
+        # Otherwise, only computes the fraction of the action probs that would have been clipped.
+        0.1
+      kl_dtarg: 0.                # The target KL to match in the KL penalized PPO objective.
+      beta_kl: 0                  # KL penalized PPO adaptive coefficient.
+  value: # The value loss.
+    kwargs:
+      use_episodic_mask: ${collector.is_episodic}
+      coef: 1                    # The loss coefficient.
+      loss_type: l2              # The loss type.
