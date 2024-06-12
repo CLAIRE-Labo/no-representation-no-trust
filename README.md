@@ -68,10 +68,10 @@ however, we provide `.csv` files combining all the raw logs to reproduce the plo
 without re-running the experiments.
 Refer to `outputs/README.md` for more information.
 
-Furthermore, all of our runs can be found in [this W&B project](https://wandb.ai/lawmen-05-shark/po-dynamics-rlc/).
+Furthermore, all of our runs can be found in [this W&B project](https://wandb.ai/lawmen-05-shark/no-representation-no-trust/).
 
-We provide a summary W&B report [here](https://api.wandb.ai/links/lawmen-05-shark/y8ald0pm)
-and a W&B report of a short replication with CleanRL [here](https://api.wandb.ai/links/lawmen-05-shark/ba3wipd7).
+We provide a summary W&B report [here](https://api.wandb.ai/links/lawmen-05-shark/70cat8oq)
+and a W&B report of a short replication with CleanRL [here](https://api.wandb.ai/links/lawmen-05-shark/m3yly6mw).
 
 ![](outputs/github-figures/replication.png "Replication with CleanRL")
 
