@@ -1,0 +1,22 @@
+# Run `wandb sweep reproducibility-scripts/template-sweep.yaml` to generate a sweep.
+# Run `wandb agent template-sweep-id` to run the sweep.
+
+project: no-representation-no-trust
+name: template-sweep
+method: grid
+metric:
+  goal: maximize
+  name: some_metric
+parameters:
+  wandb.mode:
+    value: online
+  job_subdir:
+    value: my-tagged-experiment
+  some_number:
+    values: [1, 2, 3]
+
+command:
+  - python
+  - "-m"
+  - "po_dynamics.template_experiment"
+  - ${args_no_hyphens}

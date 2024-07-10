@@ -1,0 +1,34 @@
+defaults:
+  # Common setup configs
+  - setup
+
+  # This file.
+  - _self_
+
+  # Optional override for development.
+  - optional override: capacity
+
+###################################################################################################
+
+# TODO change this directory.
+solve_dir_from_cwd: "outputs/release/solve/atari-ppo/baselines/2024-04-05_23-18-42-112955"
+capacity:
+  num_epochs: 1
+  num_envs: 1                     # Sampled to the full original evaluation limit.
+  fit_random: True                # Whether to fit random models from the same class instead of the initial models.
+  fit_checkpoint_data: False      # Whether to fit on the moving checkpoint's data distribution, or the data of the (random) initial checkpoint.
+                                  # or the initial checkpoint's data.
+  anneal_policy_lr: False          # Whether to linearly anneal the policy learning rate.
+  anneal_value_lr: False           # Whether to linearly anneal the value learning rate.
+  log_level:
+    # Frequency at which to log the training progress.
+    # == -3 means every minibatch
+    # == -2 means every epoch
+    # == -1 means every checkpoint
+    -1
+
+
+device:
+  rollout: ${resolve_device:training, cuda:0}
+  collector_storage: ${resolve_device:training, cuda:0}
+  training: ${resolve_device:training, cuda:0}

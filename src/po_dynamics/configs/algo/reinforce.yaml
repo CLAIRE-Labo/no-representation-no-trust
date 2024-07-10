@@ -1,0 +1,25 @@
+# @package _global_
+
+algo: reinforce
+
+collector:
+  agent_steps_per_env: ${env.truncate_agent_steps_at}
+  is_episodic: True
+
+optim:
+  minibatch_size: ${collector.agent_steps_per_batch}
+  num_epochs: 1
+
+loss:
+  policy:
+    module: PPOLoss
+    advantage: value_target_actor
+    kl_early_stop: 100000
+    kwargs:
+      use_episodic_mask: ${collector.is_episodic}
+      normalize_advantage: True
+      entropy_coef: 0.
+      use_clipped_loss: False
+      clip_epsilon: 0.1 # Just to compute the clipped fraction if clip was on.
+      kl_target: 0.
+      beta_kl: 0.

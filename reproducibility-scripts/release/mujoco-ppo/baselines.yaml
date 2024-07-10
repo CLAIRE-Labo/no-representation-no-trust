@@ -1,0 +1,34 @@
+project: no-representation-no-trust
+name: mujoco-ppo-baselines
+method: grid
+metric:
+  goal: maximize
+  name: batch/perf/avg_return_raw
+parameters:
+  wandb.mode:
+    value: online
+  wandb.tags:
+    value: [release, experiment, baseline]
+  outputs_subdir:
+    value: release
+  job_subdir:
+    value: "mujoco-ppo/baselines"
+  env:
+    value: gym-mujoco
+  env.name:
+    values: [ "Ant-v4", "HalfCheetah-v4", "Humanoid-v4", "Hopper-v4"]
+  seed:
+    values: [ 25, 7, 64, 27, 4 ]
+  optim.num_epochs:
+    values: [ 10, 15, 20 ]
+  optim.anneal_linearly:
+    values: [ False, True ]
+  models.activation:
+    values: [ Tanh, ReLU ]
+  collector.total_env_steps:
+    value: 5_000_000
+command:
+  - python
+  - "-m"
+  - "po_dynamics.solve"
+  - ${args_no_hyphens}

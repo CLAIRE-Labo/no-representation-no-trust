@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "no-representation-no-trust"
+readme = "README.md"
+license = { file = "LICENSE" }
+version = "0.0.1"
+requires-python = ">=3.10"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/po_dynamics", "src/cleanrl"]
+
+[tool.isort]
+known_third_party = ["wandb"]
+
+[tool.black]
+line-length = 120

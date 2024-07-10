@@ -1,0 +1,30 @@
+project: no-representation-no-trust
+name: atari-ppo-control-optimizer
+method: grid
+metric:
+  goal: maximize
+  name: batch/perf/avg_return_raw
+parameters:
+  wandb.mode:
+    value: online
+  wandb.tags:
+    value: [release, experiment, control, optimizer ]
+  outputs_subdir:
+    value: release
+  job_subdir:
+    value: "atari-ppo/control/optimizer"
+  env:
+    value: gym-atari
+  env.name:
+    values: [ "ALE/Phoenix-v5", "ALE/NameThisGame-v5", "ALE/Gravitar-v5" ]
+  seed:
+    values: [ 25, 7, 64, 27, 4 ]
+  optim.num_epochs:
+    values: [ 4, 6, 8 ]
+  optim.reset_state:
+    value: True
+command:
+  - python
+  - "-m"
+  - "po_dynamics.solve"
+  - ${args_no_hyphens}

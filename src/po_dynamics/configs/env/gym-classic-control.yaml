@@ -1,0 +1,69 @@
+# @package _global_
+
+# This is the finite-horizon version of the CartPole-v1 env.
+# For an infinite horizon version set:
+#  use_truncation_as_termination: False
+#  time_aware: False
+#  env.eval.env_steps_per_eval_env: 200 or greater to see the effect of the horizon and gamma.
+#  gamma of the target estimator of the value to < 1.
+#   you can do the same for the gamma of the target estimator of the policy,
+#   but this yields a biased policy gradient estimator anyway per the field's practice https://arxiv.org/abs/1906.07073.
+
+env:
+  lib: gym
+  sublib: classic-control
+  name: CartPole-v1
+  action_space: discrete
+  frame_skip: 1
+  truncate_env_steps_at: 200
+  use_truncation_as_termination: True
+  time_aware: True
+  noop_reset_steps: 0
+  noop_is_random: True
+  from_pixels: False
+  normalize_obs: True
+  reward_transforms:
+    sign: False
+  batchmode: torchrl
+  parallel_class: ParallelEnv
+  num_envs: 4
+  device: cpu
+  eval:
+    num_envs: 4
+    env_steps_per_eval_env: 200
+    video_env_fps: 60
+
+collector:
+  total_env_steps: 819_200
+
+models:
+  share_features: False
+  activation: Tanh
+  conv_layers:
+    num_layers: 0
+    num_filters: [ ]  # List of filter sizes.
+    kernel_sizes: [ ] # List of kernel sizes.
+    strides: [ ]    # List of strides.
+  linear_layers:
+    num_layers: 1
+    layer_size: 64
+  actor:
+    activation: ${models.activation}
+    conv_layers:
+      num_layers: ${models.conv_layers.num_layers}
+      num_filters: ${models.conv_layers.num_filters}
+      kernel_sizes: ${models.conv_layers.kernel_sizes}
+      strides: ${models.conv_layers.strides}
+    linear_layers:
+      num_layers: ${models.linear_layers.num_layers}
+      layer_size: ${models.linear_layers.layer_size}
+  critic:
+    activation: ${models.activation}
+    conv_layers:
+        num_layers: ${models.conv_layers.num_layers}
+        num_filters: ${models.conv_layers.num_filters}
+        kernel_sizes: ${models.conv_layers.kernel_sizes}
+        strides: ${models.conv_layers.strides}
+    linear_layers:
+        num_layers: ${models.linear_layers.num_layers}
+        layer_size: ${models.linear_layers.layer_size}

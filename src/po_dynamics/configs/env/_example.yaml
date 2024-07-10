@@ -1,0 +1,110 @@
+# @package _global_
+
+env:
+  lib: gym                          # E.g. gym, dm_control.
+  sublib: classic_control           # For default transforms: e.g., in gym: classic_control, box2d, mujoco.
+  name: CartPole-v1                 # env name.
+  task: can be omitted here.        # For dm_control e.g. swingup.
+  kwargs:
+    # Meant to be passed to the native env constructor.
+    # E.g. repeat_action_probability for gym atari.
+    repeat_action_probability: 0.25
+  action_space: continuous          # or discrete.
+  frame_skip:
+    # Number of steps an action is repeated, skipping the frames where it's repeated.
+    # 1 is normal behavior, no skip. 2 means every other frame is skipped ...
+    # Frame skipping is handled natively by the env library if supported (e.g., Gym Atari),
+    # otherwise by TorchRL (E.g., Gym Cartpole).
+    # Should divide env.truncate_env_steps_at, otherwise the truncation limit will be floored.
+    # Should also divide eval.video_env_fps: 30, otherwise the video will not have the correct fps.
+    1
+  truncate_env_steps_at:
+    # Truncate env (before frame_skip) at this value.
+    # (Maximum number of steps per episode.)
+    # Will be divided by frame_skip to set the limit in terms of agent steps.
+    # Should be a multiple of frame_skip, otherwise the last steps will not be sampled.
+    500
+  use_truncation_as_termination:
+    # Whether set the termination bit when truncation is reached.
+    # This makes the horizon finite.
+    # Set env.time_aware to True when setting this to True.
+    False
+  time_aware:
+    # Whether to include time in the state.
+    # Use when using a finite horizon for correct value estimation (i.e., when use_truncation_as_termination=True).
+    # Not compatible with pixel observations.
+    # With NoopReset, the time is tracked starting before the noop steps, to ensure that the truncation (termination)
+    #   time is the same for all episodes maintaining the Markov property.
+    True
+  noop_reset_steps: 0               # Number of random steps to take at the beginning of each episode.
+  noop_is_random: True              # Whether to sample up to (=True) or do exactly (=False) noop_reset_steps.
+  from_pixels: False                # Whether to use pixels as input.
+  image_transforms:
+    grayscale: False                # Whether to convert to grayscale.
+    resize: False                   # Whether to resize the image.
+    resize_w: 84                    # Width of the resized image.
+    resize_h: 84                    # Height of the resized image.
+    frame_stack: 4                  # Number of past frames to stack.
+  normalize_obs: True               # Normalization ( obs * scale + shift ) according to stats
+                                    # collected on initial random trajectories.
+  reward_transforms:
+    sign: False                     # Whether to take the sign of the reward. Also called reward clipping.
+  batchmode: torchrl                # torchrl (for ParallelEnv and TorchRL classes) or native to the library (e.g., IsaacGym).
+  parallel_class: ParallelEnv       # ParallelEnv or SerialEnv.
+  num_envs: 4                       # Number of envs to run in parallel for training.
+  device: cpu                       # native device of the env.
+  eval:
+    num_envs: 4                     # Number of envs to run in parallel for evaluation.
+    env_steps_per_eval_env:
+      # Number of env steps to play each in environment during an eval.
+      # Will be divided by frame_skip to set the limit in terms of agent steps.
+      # Truncation of the eval env will be set at this number of steps
+      # Usually at least env.truncate_env_steps_at
+      # and can be higher than training truncation to evaluate infinite horizon envs out of training bounds)
+      ${env.truncate_env_steps_at}
+    video_env_fps: 30                 # Frames per second for the video not considering frame skipping.
+
+
+collector:
+  # Data collection during training:
+  total_env_steps:
+    # Total number of steps to play in the environment: the training Budget.
+    # If frame_skip > 1, this will be different from the number of steps shown to the agent (agent_steps).
+    # The agent will see at most max_agent_steps = total_env_steps // frame_skip steps.
+    # In particular, if it's not a multiple of frame_skip, the last few steps will be dropped.
+    # This number will further be truncated to be a multiple of (collector.agent_steps_per_env * env.num_envs).
+    10240
+
+
+models:
+  # Model architecture to use for this env family.
+  # Can be specified in the common level or individually for the actor and the critic.
+  activation: Tanh
+  conv_layers:
+    num_layers: 0
+    num_filters: [ ]  # List of filter sizes.
+    kernel_sizes: [ ] # List of kernel sizes.
+    strides: [ ]    # List of strides.
+  linear_layers:
+    num_layers: 1
+    layer_size: 64
+  actor:
+    activation: ${models.activation}
+    conv_layers:
+      num_layers: ${models.conv_layers.num_layers}
+      num_filters: ${models.conv_layers.num_filters}
+      kernel_sizes: ${models.conv_layers.kernel_sizes}
+      strides: ${models.conv_layers.strides}
+    linear_layers:
+      num_layers: ${models.linear_layers.num_layers}
+      layer_size: ${models.linear_layers.layer_size}
+  critic:
+    activation: ${models.activation}
+    conv_layers:
+        num_layers: ${models.conv_layers.num_layers}
+        num_filters: ${models.conv_layers.num_filters}
+        kernel_sizes: ${models.conv_layers.kernel_sizes}
+        strides: ${models.conv_layers.strides}
+    linear_layers:
+        num_layers: ${models.linear_layers.num_layers}
+        layer_size: ${models.linear_layers.layer_size}

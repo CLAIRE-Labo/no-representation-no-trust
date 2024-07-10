@@ -1,0 +1,34 @@
+# @package _global_
+
+# Hyperparameters from the original paper (for Atari). https://arxiv.org/pdf/1707.06347.pdf
+algo: ppo
+
+collector:
+  agent_steps_per_env: 128
+  is_episodic: False
+
+optim:
+  minibatch_size: 256
+  num_epochs: 3
+
+loss:
+  policy:
+    module: PPOLoss
+    advantage: advantage_actor
+    kl_early_stop: False
+    kl_stop_limit: 0.01
+    kwargs:
+      use_episodic_mask: ${collector.is_episodic}
+      normalize_advantage: True
+      entropy_coef: 0.01
+      use_clipped_loss: False
+      clip_epsilon: 0.1
+      kl_target: 0.01
+      beta_kl: 0.
+      feature_trust_region_regularize_or_clip: "regularize"
+      feature_trust_region_coef: 0.
+      feature_trust_region_limit: 0.1
+      feature_trust_region_type: "l2"
+      feature_trust_use_preactivation: True
+      feature_trust_all_layers: False
+      safe_logratio: False

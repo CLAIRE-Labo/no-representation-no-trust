@@ -1,0 +1,27 @@
+# @package _global_
+
+optim:
+  num_epochs: 4
+  minibatch_size: 128
+  algo: Adam
+  max_grad_norm: 0.5
+  kwargs:
+    lr: 0.00025
+
+collector:
+  agent_steps_per_env: 256
+  is_episodic: True
+
+loss:
+  policy:
+    module: PPOLoss
+    advantage: advantage_actor
+    kl_stop_limit: 0.001
+    kwargs:
+      clip_epsilon: 0.2
+      entropy_coef: 0.01
+      kl_target: 0.001
+  value:
+    kwargs:
+      coef: 0.5
+      loss_type: l2

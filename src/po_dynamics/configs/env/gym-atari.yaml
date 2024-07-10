@@ -1,0 +1,70 @@
+# @package _global_
+
+env:
+  lib: gym
+  sublib: atari
+  name: ALE/Phoenix-v5
+  kwargs:
+    repeat_action_probability: 0.25 # Sticky actions
+  action_space: discrete
+  frame_skip: 3
+  truncate_env_steps_at: 108_000
+  # Default of 30 min of play time at 60 fps.
+  # See https://github.com/Farama-Foundation/Arcade-Learning-Environment/blob/9fd31e0b3d8d6241e1b28e14123fcdb398ed1437/src/python/gym.py#L179C47-L179C54
+  use_truncation_as_termination: True
+  time_aware: False
+  noop_reset_steps: 0
+  noop_is_random: True
+  from_pixels: True
+  image_transforms:
+    grayscale: True
+    resize: True
+    resize_w: 84
+    resize_h: 84
+    frame_stack: 4
+  normalize_obs: False
+  reward_transforms:
+    sign: True
+  batchmode: torchrl
+  parallel_class: ParallelEnv
+  num_envs: 8
+  device: cpu
+  eval:
+    num_envs: 3
+    env_steps_per_eval_env: 108_000   # 30 min of play time at 60 fps. (Default for training.)
+    video_env_fps: 60
+
+collector:
+  total_env_steps: 100_000_000
+
+models:
+  share_features: False
+  activation: ReLU
+  conv_layers:
+    num_layers: 3
+    num_filters: [ 32, 64, 64 ]
+    kernel_sizes: [ 8, 4, 3 ]
+    strides: [ 4, 2, 1 ]
+  linear_layers:
+    num_layers: 1
+    layer_size: 512
+  actor:
+    activation: ${models.activation}
+    conv_layers:
+      num_layers: ${models.conv_layers.num_layers}
+      num_filters: ${models.conv_layers.num_filters}
+      kernel_sizes: ${models.conv_layers.kernel_sizes}
+      strides: ${models.conv_layers.strides}
+    linear_layers:
+      num_layers: ${models.linear_layers.num_layers}
+      layer_size: ${models.linear_layers.layer_size}
+  critic:
+    activation: ${models.activation}
+    conv_layers:
+        num_layers: ${models.conv_layers.num_layers}
+        num_filters: ${models.conv_layers.num_filters}
+        kernel_sizes: ${models.conv_layers.kernel_sizes}
+        strides: ${models.conv_layers.strides}
+    linear_layers:
+        num_layers: ${models.linear_layers.num_layers}
+        layer_size: ${models.linear_layers.layer_size}

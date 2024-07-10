@@ -1,0 +1,62 @@
+# @package _global_
+
+# Default hyperparameters used in popular benchmarks: SB3 and CleanRL
+
+# CleanRL curves and config in
+# benchmark: https://wandb.ai/openrlbenchmark/openrlbenchmark/reports/Atari-CleanRL-s-PPO--VmlldzoxNjk3NjYy
+# config: https://wandb.ai/openrlbenchmark/cleanrl/runs/27ne7q93
+
+# SB3 curves and config in
+# https://github.com/openrlbenchmark/openrlbenchmark/issues/7
+# benchmark: https://wandb.ai/openrlbenchmark/sb3
+# config: https://wandb.ai/openrlbenchmark/sb3/runs/93thhc58/overview
+
+## Notable differences.
+
+# We don't share the features layers between the policy and value networks.
+# We study the representation of each network separately.
+
+# CleanRL has an extra default 1/2 coeff in front of the l2 loss: v_coeff * 1/2 *(v - v_target)**2,
+# SB3 doesn't, here we don't, and the resulting expression with config value is the same: 1/2 *(v - v_target)**2
+
+# CleanRL clips the value loss (in the benchmark runs, not anymore),
+# SB3 doesn't, here we don't. This is closer to the common value network training settings.
+# Also, from the literature clipping the value loss harms performance.
+
+# Some other pointer for benchmarks:
+# Note these use the old atari env settings (v4, no sticky actions, terminate on life loss, etc).
+# We use the new v5.
+# https://wandb.ai/openrlbenchmark/sb3
+# https://github.com/vwxyzjn/ppo-atari-metrics/blob/main/compare.png
+
+env:
+  num_envs: 8   # num_envs in CleanRL, n_envs in SB3
+
+collector:
+  agent_steps_per_env: 128  # num_steps in CleanRL, n_steps in SB3
+
+optim:
+  algo: Adam
+  max_grad_norm: 0.5  # max_grad_norm in CleanRL, and SB3
+  kwargs:
+    lr:  0.00025  #  learning_rate in CleanRL, and SB3
+  minibatch_size: 256 # minibatch_size in CleanRL, batch_size in SB3
+    # Gives 4 minibatches per epoch.
+  num_epochs: 4       # update_epochs in CleanRL, n_epochs in SB3
+
+target_estimator_kwargs:
+  gamma: 0.99 # gamma in CleanRL, and SB3
+  lmbda: 0.95 # gae_lambda in CleanRL, and SB3
+
+loss:
+  policy:
+    kl_stop_limit: 0.01 # = kl_target * 1.
+    kwargs:
+      normalize_advantage: True # norm_adv in CleanRL, and normalize_advantage in SB3
+      clip_epsilon: 0.1 # clip_coef in CleanRL, clip_range in SB3 (annealed)
+      entropy_coef: 0.01  # ent_coef in CleanRL, and SB3
+      kl_target: 0.01 # default in PPO paper.
+  value:
+    kwargs:
+      coef: 0.5
+      loss_type: l2

@@ -1,0 +1,11 @@
+# @package _global_
+
+optim:
+  algo: Adam
+  max_grad_norm: 1000
+  kwargs:
+    lr: 0.01
+
+collector:
+  agent_steps_per_env: 256
+  is_episodic: True

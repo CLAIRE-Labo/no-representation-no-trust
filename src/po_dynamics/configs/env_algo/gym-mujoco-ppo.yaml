@@ -1,0 +1,35 @@
+# @package _global_
+
+# Hyperparameters from PPO paper on MuJoCo.
+# https://arxiv.org/pdf/1707.06347.pdf Table 3
+
+optim:
+  num_epochs: 10
+  minibatch_size: 64
+  algo: Adam
+  max_grad_norm: 0.5
+  kwargs:
+    lr: 0.0003
+
+collector:
+  agent_steps_per_env: 1024
+  is_episodic: False
+
+target_estimator_kwargs:
+  gamma: 0.99
+  lmbda: 0.95
+
+loss:
+  policy:
+    advantage: advantage_actor
+    kl_stop_limit: 0.01
+    kwargs:
+      normalize_advantage: True
+      clip_epsilon: 0.2
+      entropy_coef: 0.0
+      kl_target: 0.01
+      safe_logratio: True
+  value:
+    kwargs:
+      coef: 0.5
+      loss_type: l2

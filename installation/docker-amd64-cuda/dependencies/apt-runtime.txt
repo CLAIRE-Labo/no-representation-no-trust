@@ -1,0 +1,12 @@
+# `apt` runtime requirements file.
+# These dependencies are required to run your code.
+zsh                 # Required.
+openssl             # Required.
+htop                # Useful.
+swig
+libglfw3
+libglew2.2
+libgl1-mesa-glx
+libosmesa6
+xvfb
+sudo
