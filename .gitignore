@@ -146,6 +146,7 @@ outputs/*
 !outputs/github-figures
 !outputs/release-plotting/plots/.placeholder
 !outputs/release-plotting/combined-raw-logs/.placeholder
+!outputs/poster*
 
 third-party/*
 !third-party/.placeholder
